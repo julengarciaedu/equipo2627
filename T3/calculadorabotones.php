@@ -14,10 +14,10 @@
         <input type="number" name="oper1" required>
         <label>Segundo operando: </label>
         <input type="number" name="oper2" required>
-        <button type="submit" name="boton" value="1">+</button>
-        <button type="submit" name="boton" value="2">-</button><br>
-        <button type="submit" name="boton" value="3">*</button>
-        <button type="submit" name="boton" value="4">/</button>
+        <button type="submit" name="boton" value="suma">➕</button>
+        <button type="submit" name="boton" value="resta">➖</button><br>
+        <button type="submit" name="boton" value="mult">✖️</button>
+        <button type="submit" name="boton" value="div">➗</button>
         <label>Resultado</label>
         <input type="text" disabled>    
     </form>  

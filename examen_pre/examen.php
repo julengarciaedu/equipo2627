@@ -113,58 +113,80 @@
         <?php
             //var_dump($_SERVER);
             //if($_SERVER['REQUEST_METHOD'] == 'GET') { //La carga de la página ya viene de una petición GET así que una primera carga siempre es GET, aunque no lleve parámetros
+                
             if(isset($_GET['ciudad'])) { //Nos permite saber si se ha pulsado el submit, si no, $_GET no tiene ninguna clave 'ciudad' con lo cual el isset devuelve false
-                $ciudad = $_GET['ciudad'] ?? ""; //Lo recogemos, y si no viene nada metemos un vacío.
-                if ($ciudad !== "") { 
-                    echo "Has buscado la ciudad: $ciudad";
-                } else {
-                    echo "No hay buscado nada, olvidón.";
-                }
-            } else { //Si entramos al else es por que no se ha pulsado el submit, metiendo o sin meter un dato, así que mostramos el form
-        ?>
-            <p><strong>Introduce el nombre de una ciudad<strong></p>
-            <form action="examen.php" method="GET">
-                <label>Ciudad</label>
-                <input type="text" name="ciudad">
-                <button type="submit">Enviar</button>
-            </form>
-        <?php } ?>
-        <h2>POST</h2>
-            <form action="examen.php" method="POST" novalidate>
-                <label for="nombre">Nombre *</label>
-                <input type="text" id="nombre" name="nombre">
-                <label for="email">Email *</label>
-                <input type="email" id="email" name="email">
-                <label for="edad">Edad * (entre 16 y 65)</label>
-                <input type="number" id="edad" name="edad" min="16" max="65">
-                <label for="curso">Curso *</label>
-                <select id="curso" name="curso">
-                    <option value="">-- Selecciona un curso --</option>
-                    <?php foreach (['1º DAW', '2º DAW', '1º DAM', '2º DAM'] as $c): ?>
-                        <option value="<?= $c ?>"><?= $c ?></option>
-                    <?php endforeach; ?>
-                </select>
-                <fieldset>
-                    <legend>Turno *</legend>
-                    <label>
-                        <input type="radio" name="turno" value="Mañana"> Mañana
-                    </label>
-                    <label>
-                        <input type="radio" name="turno" value="Tarde"> Tarde
-                    </label>
-                </fieldset>
-                <fieldset>
-                    <legend>Actividades * (marca al menos una)</legend>
-                    <?php foreach (['Robótica', 'Ajedrez', 'Teatro', 'Fútbol'] as $a): ?>
-                            <label>
-                                <input type="checkbox" name="actividades[]" value="<?= $a ?>"> <?= $a ?>
-                            </label>
+                    $ciudad = $_GET['ciudad'] ?? ""; //Lo recogemos, y si no viene nada metemos un vacío.
+                    if ($ciudad !== "") { 
+                        echo "Has buscado la ciudad: $ciudad";
+                    } else {
+                        echo "No hay buscado nada, olvidón.";
+                    }
+                } else { //Si entramos al else es por que no se ha pulsado el submit, metiendo o sin meter un dato, así que mostramos el form
+            ?>
+                <p><strong>Introduce el nombre de una ciudad<strong></p>
+                <form action="examen.php" method="GET">
+                    <label>Ciudad</label>
+                    <input type="text" name="ciudad">
+                    <button type="submit">Enviar</button>
+                </form>
+            <?php } ?>
+            <h2>POST</h2>
+            <?php  
+                //echo $_SERVER['REQUEST_METHOD'];
+                //if($_SERVER['REQUEST_METHOD'] === 'POST') $errores = validarErrores($_POST);
+                $errores = ($_SERVER['REQUEST_METHOD'] === 'POST') ? validarErrores($_POST) : [];
+                    //var_dump($errores);
+                    //if (count($errores)>0) {
+                if($_SERVER['REQUEST_METHOD'] !== 'POST' || ($_SERVER['REQUEST_METHOD'] === 'POST' && count($errores)>0)){    
+                ?>
+                <form action="examen.php" method="POST" novalidate>
+                    <label for="nombre">Nombre *</label>
+                    <input type="text" id="nombre" name="nombre" value="<?= htmlspecialchars($_POST['nombre'] ?? '')?>">
+                        <?php if (isset($errores['nombre'])) echo "<label style='color:red'>".$errores['nombre']."</label>"; ?>
+                    <label for="email">Email *</label>
+                    <input type="email" id="email" name="email" value="<?= htmlspecialchars($_POST['email'] ?? '')?>">
+                        <?php if (isset($errores['email'])) echo "<label style='color:red'>".$errores['email']."</label>"; ?>
+                    <label for="edad">Edad * (entre 16 y 65)</label>
+                    <input type="number" id="edad" name="edad" min="16" max="65" value="<?= htmlspecialchars($_POST['edad'] ?? '')?>">
+                        <?php if (isset($errores['edad'])) echo "<label style='color:red'>".$errores['edad']."</label>"; ?>
+                    <label for="curso">Curso *</label>
+                    <select id="curso" name="curso">
+                        <option value="">-- Selecciona un curso --</option>
+                        <?php foreach (['1º DAW', '2º DAW', '1º DAM', '2º DAM'] as $c): ?>
+                            <option value="<?= $c ?>" <?php if (isset($_POST['curso']) && $_POST['curso']===$c) echo 'selected' ?>><?= $c ?></option>
                         <?php endforeach; ?>
-                </fieldset>
-                <label for="comentarios">Comentarios (opcional, máximo 200 caracteres)</label>
-                <textarea id="comentarios" name="comentarios" rows="4" maxlength="200"></textarea>
-                <button type="submit">Enviar inscripción</button>
-        </form>
+                    </select>
+                    <?php if (isset($errores['curso'])) echo "<label style='color:red'>".$errores['curso']."</label>"; ?>
+                    <fieldset>
+                        <legend>Turno *</legend>
+                        <label>
+                            <input type="radio" name="turno" value="Mañana" <?php if (isset($_POST['turno']) && $_POST['turno']==="Mañana") echo 'checked' ?>> Mañana
+                        </label>
+                        <label>
+                            <input type="radio" name="turno" value="Tarde" <?php if (isset($_POST['turno']) && $_POST['turno']==="Tarde") echo 'checked' ?>> Tarde
+                        </label>
+                        <?php if (isset($errores['turno'])) echo "<label style='color:red'>".$errores['turno']."</label>"; ?>
+                    </fieldset>
+                    <fieldset>
+                        <legend>Actividades * (marca al menos una)</legend>
+                        <?php foreach (['Robótica', 'Ajedrez', 'Teatro', 'Fútbol'] as $a): ?>
+                                <label>
+                                    <input type="checkbox" name="actividades[]" value="<?= $a ?>" <?php if (isset($_POST['actividades']) && in_array($a, $_POST['actividades'])) echo 'checked'; ?>> <?= $a ?>
+                                </label>
+                            <?php endforeach; ?>
+                        <?php if (isset($errores['actividades'])) echo "<label style='color:red'>".$errores['actividades']."</label>"; ?>    
+                    </fieldset>
+                    <label for="comentarios">Comentarios (opcional, máximo 200 caracteres)</label>
+                    <textarea id="comentarios" name="comentarios" rows="4" maxlength="200"><?php if (isset($_POST['comentarios'])) echo $_POST['comentarios']; ?></textarea>
+                    <?php if (isset($errores['comentarios'])) echo "<label style='color:red'>".$errores['comentarios']."</label>"; ?>
+                    <button type="submit">Enviar inscripción</button>
+            </form>
+            <?php 
+            } else {
+                echo "<h3>Mostramos los resultados<h3>";
+            }
+            ?>               
+
 </body>
 </html>
 

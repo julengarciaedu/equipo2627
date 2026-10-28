@@ -48,4 +48,38 @@ function libroMasAntiguoMasReciente2(array $libros):string {
     return "El título más antiguo es ".$libros[$posmenor]['titulo']." ($menor) y el título más reciente es ".$libros[$posmayor]['titulo']." ($mayor)";
 }
 
+/* Función que valida los posibles errores del formulario POST del ejercicio 7 */
+// Devuelve un array asociativo $errores con el posible error de cada campo
+function validarErrores(array $post): array {
+    $errores=[];
+    
+    // Nombre: Obligatorio, mínimo 3 caracteres
+    if ($post['nombre'] !== ""){
+        if (strlen($post['nombre']) < 3) 
+            $errores['nombre'] = "El nombre debe tener más de tres caracteres";    
+    } else 
+        $errores['nombre'] = "El nombre es obligatorio";
+    
+    //Email: Obligatorio
+    if ($post['email'] === "") $errores['email'] = "El email es obligatorio";
+    
+    //Edad: Obligatorio, entre 16 y 65
+    if ($post['edad'] === "") $errores['edad'] = "La edad es obligatoria";
+    elseif (!is_numeric($post['edad'])) $errores['edad'] = "La edad no es numérica";
+    elseif ($post['edad']<16 && $post['edad']<65) $errores['edad'] = "La edad debe estar entre 16 y 65";
+
+    //Curso: Uno de los valores de la lista
+    if(!in_array($post['curso'],['1º DAW', '2º DAW', '1º DAM', '2º DAM'])) $errores['curso'] = "El valor del curso no es válido, elija uno de la lista";
+
+    //Turno: Uno de los valores de la lista
+    if(!isset($post['turno']) || !in_array($post['turno'],['Mañana', 'Tarde'])) $errores['turno'] = "El valor del turno no es válido, elija una de las opciones";
+
+    //Actividades: Alguna
+    if(!isset($post['actividades'])) $errores['actividades'] = "No ha seleccionado ninguna actividad y debe seleccionar por lo menos una"; 
+    
+    //Comentarios: no más de 200 caracteres
+    if(isset($post['comentarios']) && strlen($post['comentarios'])>200) $errores['comentarios'] = "El comentario no puede superar los 200 caracteres. Acórtelo, por favor";  
+    return $errores;
+}
+
 ?>
